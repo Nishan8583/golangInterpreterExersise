@@ -17,7 +17,7 @@ func main() {
 	let add = fn(x,y) {
 		x+y;
 	}
-	
+	== != 
 	let result = add(five,ten)`
 	log.Println("About to create a lexer object")
 	l := lexer.New(input)

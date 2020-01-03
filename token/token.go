@@ -19,15 +19,16 @@ const (
 	INT   = "int"
 
 	// operators
-	ASSIGN  = "="
-	PLUS    = "+"
-	MINUS   = "-"
-	BANG    = "!"
-	ASTERIK = "*"
-	SLASH   = "/"
-	LT      = "<"
-	GT      = ">"
-
+	ASSIGN    = "="
+	PLUS      = "+"
+	MINUS     = "-"
+	BANG      = "!"
+	ASTERIK   = "*"
+	SLASH     = "/"
+	LT        = "<"
+	GT        = ">"
+	EQ        = "=="
+	NOT_EQ    = "!="
 	COMMA     = ","
 	SEMICOLON = ";"
 

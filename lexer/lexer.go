@@ -3,7 +3,9 @@ The lexer package parses the monkey lanauge and contains all the responsible fun
 */
 package lexer
 
-import "../token"
+import (
+	"../token"
+)
 
 // Lexer struct holds the total script input, the current position of input,
 // readPosition will hold the next character to read,
@@ -39,7 +41,6 @@ func (l *Lexer) NextToken() token.Token {
 	var tok token.Token // token to return
 
 	l.skipWhiteSpace() // escaping all the whitespace
-
 	switch l.ch {
 	case '=':
 		tok = newToken(token.ASSIGN, l.ch)
@@ -60,6 +61,16 @@ func (l *Lexer) NextToken() token.Token {
 	case '0':
 		tok.Literal = ""
 		tok.Type = token.EOF
+	case '-':
+		tok = newToken(token.MINUS, l.ch)
+	case '!':
+		tok = newToken(token.BANG, l.ch)
+	case '*':
+		tok = newToken(token.ASTERIK, l.ch)
+	case '<':
+		tok = newToken(token.LT, l.ch)
+	case '>':
+		tok = newToken(token.GT, l.ch)
 	default:
 		if isLetter(l.ch) {
 			tok.Literal = l.readIdentifier()
@@ -70,7 +81,7 @@ func (l *Lexer) NextToken() token.Token {
 			tok.Literal = l.readNumber()
 			return tok
 		} else {
-			tok = newToken(token.ILLEGEAL, l.ch)
+			tok = newToken(token.ILLEGAL, l.ch)
 			return tok
 		}
 
@@ -79,13 +90,17 @@ func (l *Lexer) NextToken() token.Token {
 	return tok
 }
 
+// Returns a new tokenType
 func newToken(tokenType token.TokenType, ch byte) token.Token {
 	return token.Token{Type: tokenType, Literal: string(ch)}
 }
 
 // Chekcinf if the passed byte is a letter
 func isLetter(ch byte) bool {
-	return ch >= 'a' && ch <= 'z' || ch >= 'A' || ch <= 'Z' || ch == '_' // if greater and less then comparsion
+	if ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch == '_' {
+		return true // if the above condition is matched, then this was infact a letter, and thus we return true
+	}
+	return false // if the condiion was not matched, then we return false
 }
 
 // very clever and simple code here, i like it
@@ -106,7 +121,10 @@ func (l *Lexer) skipWhiteSpace() {
 
 // checkinf if the byte is an integer
 func isDigit(ch byte) bool {
-	return ch >= '0' && ch <= '9'
+	if ch >= '0' && ch <= '9' {
+		return true
+	}
+	return false
 }
 
 // reading the input and updating the char until non read postion was reached

@@ -12,14 +12,21 @@ type Token struct {
 
 const (
 	// comments
-	ILLEGEAL = "ILLEGAL" // if illegal
-	EOF      = "EOF"
+	ILLEGAL = "ILLEGAL" // if illegal
+	EOF     = "EOF"
 
 	IDENT = "IDENT" // identifiers i.e function, variable names
 	INT   = "int"
 
-	ASSIGN = "="
-	PLUS   = "+"
+	// operators
+	ASSIGN  = "="
+	PLUS    = "+"
+	MINUS   = "-"
+	BANG    = "!"
+	ASTERIK = "*"
+	SLASH   = "/"
+	LT      = "<"
+	GT      = ">"
 
 	COMMA     = ","
 	SEMICOLON = ";"
@@ -29,13 +36,24 @@ const (
 	LBRACE = "{"
 	RBRACE = "}"
 
+	// keywpords
 	FUNCTION = "FUNCTION"
 	LET      = "LET"
+	TRUE     = "TRUE"
+	FALSE    = "FALSE"
+	IF       = "IF"
+	ELSE     = "ELSE"
+	RETURN   = "RETURN"
 )
 
 var keywords = map[string]TokenType{
-	"fn":  FUNCTION,
-	"let": LET,
+	"fn":     FUNCTION,
+	"let":    LET,
+	"true":   TRUE,
+	"false":  FALSE,
+	"if":     IF,
+	"else":   ELSE,
+	"return": RETURN,
 }
 
 // LookupIdent will check the the identifier is a keyword

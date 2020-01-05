@@ -43,7 +43,7 @@ type LetStatement struct {
 // Identifier is structure for variable type
 type Identifier struct {
 	Token token.Token // token.IDENT type
-	valye string      // The identifier value i.e varabile name
+	Value string      // The identifier value i.e varabile name
 }
 
 func (lex *LetStatement) statementNode() {}

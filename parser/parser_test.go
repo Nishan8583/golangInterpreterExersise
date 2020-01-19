@@ -1,13 +1,6 @@
 package parser
 
-import (
-	"log"
-	"testing"
-
-	"../ast"
-	"../lexer"
-)
-
+/*
 func TestLetStatements(t *testing.T) {
 
 	// the input that will be fed into the testing funciton
@@ -74,3 +67,4 @@ func testLetStatement(t *testing.T, s ast.Statement, name string) bool {
 	return true
 
 }
+*/

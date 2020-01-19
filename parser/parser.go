@@ -1,8 +1,6 @@
 package parser
 
 import (
-	"log"
-
 	"../ast"
 	"../lexer"
 	"../token"
@@ -15,6 +13,7 @@ type Parser struct {
 	peekToken token.Token  // The next token we will work with, sometime the curtoken may not have complete value
 }
 
+// New takes a lexer type and returns parser type
 func New(l *lexer.Lexer) *Parser {
 	p := &Parser{
 		l: l,
@@ -50,8 +49,27 @@ func (p *Parser) parseStatement() ast.Statement {
 	switch p.curToken.Type {
 	case token.LET: // if the token was LET type
 		return p.parseLetStatement()
+	case token.RETURN:
+		return p.parseReturnStatement()
 	default:
 		return nil
+	}
+}
+
+func (p *Parser) curTokenIs(t token.TokenType) bool {
+	return p.curToken.Type == t
+}
+
+func (p *Parser) peekTokenIs(t token.TokenType) bool {
+	return p.peekToken.Type == t
+}
+
+func (p *Parser) expectPeek(t token.TokenType) bool {
+	if p.peekTokenIs(t) {
+		p.nextToken()
+		return true
+	} else {
+		return false
 	}
 }
 
@@ -75,20 +93,12 @@ func (p *Parser) parseLetStatement() *ast.LetStatement {
 
 }
 
-func (p *Parser) curTokenIs(t token.TokenType) bool {
-	log.Println(t, p.curToken.Literal)
-	return p.curToken.Type == t
-}
+// now parse return statement
+func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
+	stmt := &ast.ReturnStatement{Token: p.curToken}
 
-func (p *Parser) peekTokenIs(t token.TokenType) bool {
-	return p.peekToken.Type == t
-}
-
-func (p *Parser) expectPeek(t token.TokenType) bool {
-	if p.peekTokenIs(t) {
+	for !p.curTokenIs(token.SEMICOLON) {
 		p.nextToken()
-		return true
-	} else {
-		return false
 	}
+	return stmt
 }

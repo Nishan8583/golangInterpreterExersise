@@ -33,6 +33,8 @@ type Expression interface {
 	expressionNode()
 }
 
+/*-------------LET STATEMENT AST-------------*/
+
 // LetStatement Abstract structure for let
 type LetStatement struct {
 	Token token.Token // The tokent let
@@ -58,4 +60,32 @@ func (id *Identifier) statementNode() {}
 // TokenLiteral returns string
 func (id *Identifier) TokenLiteral() string {
 	return id.Token.Literal
+}
+
+/*-------------Return STATEMENT AST-------------*/
+
+// ReturnStatement structure as the ast for return <expression>
+type ReturnStatement struct {
+	Token       token.Token // holds the return token
+	ReturnValue Expression  // will hold the returned value
+}
+
+func (rs *ReturnStatement) statementNode() {}
+
+// TokenLiteral will the literal token itself
+func (rs *ReturnStatement) TokenLiteral() string {
+	return rs.Token.Literal
+}
+
+/*-------------Expression AST-------------*/
+
+//Ast for expressions such as 4+5 ...
+type ExpressionStatement struct {
+	Token      token.Token // the first token of the expression
+	Expression Expression  // The expression
+}
+
+func (es *ExpressionStatement) statementNode() {}
+func (es *ExpressionStatement) TokenLiteral() string {
+	return es.Token.Literal
 }

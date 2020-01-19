@@ -49,7 +49,6 @@ func (p *Parser) ParseProgram() *ast.Program {
 func (p *Parser) parseStatement() ast.Statement {
 	switch p.curToken.Type {
 	case token.LET: // if the token was LET type
-		log.Println("Tis LET")
 		return p.parseLetStatement()
 	default:
 		return nil
@@ -61,19 +60,15 @@ func (p *Parser) parseLetStatement() *ast.LetStatement {
 	stmt := &ast.LetStatement{Token: p.curToken}
 
 	if !p.expectPeek(token.IDENT) { // if the next statement was not a variable
-		log.Println("Not token Ident")
 		return nil
 	}
 
 	stmt.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
-	log.Println(stmt.Name)
-	if !p.curTokenIs(token.ASSIGN) { // if the current token now is not equals
-		log.Println("not Assign")
+	if !p.expectPeek(token.ASSIGN) { // if the current token now is not equals
 		return nil
 	}
 
 	for !p.curTokenIs(token.SEMICOLON) {
-		log.Println("not semicolon")
 		p.nextToken()
 	}
 	return stmt

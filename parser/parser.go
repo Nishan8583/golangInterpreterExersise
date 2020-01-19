@@ -1,6 +1,8 @@
 package parser
 
 import (
+	"log"
+
 	"../ast"
 	"../lexer"
 	"../token"
@@ -14,14 +16,14 @@ type Parser struct {
 }
 
 func New(l *lexer.Lexer) *Parser {
-	p := Parser{
+	p := &Parser{
 		l: l,
 	}
 
 	p.nextToken() // Initilization of both curtoken and peekToken
 	p.nextToken()
 
-	return &p
+	return p
 }
 
 func (p *Parser) nextToken() {
@@ -37,16 +39,17 @@ func (p *Parser) ParseProgram() *ast.Program {
 	for p.curToken.Type != token.EOF {
 		stmt := p.parseStatement()
 		if stmt != nil {
-			program.Statements = append(program.Statements, *stmt)
+			program.Statements = append(program.Statements, stmt)
 		}
 		p.nextToken()
 	}
 	return program
 }
 
-func (p *Parser) parseStatement() *ast.Statement {
+func (p *Parser) parseStatement() ast.Statement {
 	switch p.curToken.Type {
 	case token.LET: // if the token was LET type
+		log.Println("Tis LET")
 		return p.parseLetStatement()
 	default:
 		return nil
@@ -58,16 +61,19 @@ func (p *Parser) parseLetStatement() *ast.LetStatement {
 	stmt := &ast.LetStatement{Token: p.curToken}
 
 	if !p.expectPeek(token.IDENT) { // if the next statement was not a variable
+		log.Println("Not token Ident")
 		return nil
 	}
 
 	stmt.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
-
+	log.Println(stmt.Name)
 	if !p.curTokenIs(token.ASSIGN) { // if the current token now is not equals
+		log.Println("not Assign")
 		return nil
 	}
 
 	for !p.curTokenIs(token.SEMICOLON) {
+		log.Println("not semicolon")
 		p.nextToken()
 	}
 	return stmt
@@ -75,6 +81,7 @@ func (p *Parser) parseLetStatement() *ast.LetStatement {
 }
 
 func (p *Parser) curTokenIs(t token.TokenType) bool {
+	log.Println(t, p.curToken.Literal)
 	return p.curToken.Type == t
 }
 

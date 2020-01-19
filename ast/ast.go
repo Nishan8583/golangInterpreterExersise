@@ -11,14 +11,14 @@ type Program struct {
 
 func (p *Program) TokenLiteral() string {
 	if len(p.Statements) > 0 {
-		return p.Statements[0].TokeLiteral()
+		return p.Statements[0].TokenLiteral()
 	}
 	return ""
 }
 
 //Node ... Each thing in the code is a node ?
 type Node interface {
-	TokeLiteral() string // for debugging purpose
+	TokenLiteral() string // for debugging purpose
 }
 
 // Statement is something that does not produce any value
@@ -46,11 +46,11 @@ type Identifier struct {
 	Value string      // The identifier value i.e varabile name
 }
 
-func (lex *LetStatement) statementNode() {}
+func (let *LetStatement) statementNode() {}
 
 //TokenLiteral returns the token.Literal value
-func (lex *LetStatement) TokenLiteral() string {
-	return lex.Token.Literal
+func (let *LetStatement) TokenLiteral() string {
+	return let.Token.Literal
 }
 
 func (id *Identifier) statementNode() {}

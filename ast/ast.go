@@ -3,6 +3,8 @@ package ast
 
 import (
 	"../token"
+
+	"bytes"
 )
 
 type Program struct {
@@ -16,9 +18,21 @@ func (p *Program) TokenLiteral() string {
 	return ""
 }
 
+//
+func (p *Program) String() string {
+	var out bytes.Buffer
+
+	for _, s := range p.Statements {
+		out.WriteString(s.String())
+	}
+
+	return out.String()
+}
+
 //Node ... Each thing in the code is a node ?
 type Node interface {
 	TokenLiteral() string // for debugging purpose
+	String() string       // This was added later, used only for debugging purpose
 }
 
 // Statement is something that does not produce any value
@@ -55,12 +69,31 @@ func (let *LetStatement) TokenLiteral() string {
 	return let.Token.Literal
 }
 
-func (id *Identifier) statementNode() {}
+//String debug helper funciton for let statement
+func (let *LetStatement) String() string {
+	var out bytes.Buffer
+
+	out.WriteString(let.TokenLiteral() + " ")
+	out.WriteString(let.Name.String())
+	out.WriteString(" = ")
+
+	if let.Value != nil {
+		out.WriteString(let.Value.String())
+	}
+
+	out.WriteString(";")
+
+	return out.String()
+}
+
+func (id *Identifier) expressionNode() {}
 
 // TokenLiteral returns string
 func (id *Identifier) TokenLiteral() string {
 	return id.Token.Literal
 }
+
+func (id *Identifier) String() string { return id.Value }
 
 /*-------------Return STATEMENT AST-------------*/
 
@@ -77,6 +110,19 @@ func (rs *ReturnStatement) TokenLiteral() string {
 	return rs.Token.Literal
 }
 
+func (rs *ReturnStatement) String() string {
+	var out bytes.Buffer
+
+	out.WriteString(rs.TokenLiteral() + " ")
+
+	if rs.ReturnValue != nil {
+		out.WriteString(rs.ReturnValue.String())
+	}
+
+	out.WriteString(";")
+	return out.String()
+}
+
 /*-------------Expression AST-------------*/
 
 //Ast for expressions such as 4+5 ...
@@ -86,6 +132,17 @@ type ExpressionStatement struct {
 }
 
 func (es *ExpressionStatement) statementNode() {}
+
+// TokebLiteral fullfills the Node interface requirement
 func (es *ExpressionStatement) TokenLiteral() string {
 	return es.Token.Literal
+}
+
+func (es *ExpressionStatement) String() string {
+
+	if es.Expression != nil {
+		return es.Expression.String()
+	}
+
+	return ""
 }

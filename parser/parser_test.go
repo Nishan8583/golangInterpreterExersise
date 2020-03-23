@@ -1,5 +1,12 @@
 package parser
 
+import (
+	"testing"
+
+	"../ast"
+	"../lexer"
+)
+
 /*
 func TestLetStatements(t *testing.T) {
 
@@ -67,4 +74,64 @@ func testLetStatement(t *testing.T, s ast.Statement, name string) bool {
 	return true
 
 }
+
+func TestIntegerLiteralExpression(t *testing.T) {
+	input := "5;"
+
+	l := lexer.New(input)
+	p := New(l)
+
+	program := p.ParseProgram()
+
+	if len(program.Statements) != 1 {
+		t.Errorf("ERROR could not get any statements from programs %v", len(program.Statements))
+	}
+
+	t.Log("Here is the whole program statements", program.Statements)
+
+}
 */
+
+func TestParsingPrefixExpressions(t *testing.T) {
+	prefixTests := []struct {
+		input        string
+		operator     string
+		integerValue int64
+	}{
+		{"!5", "!", 5},
+		{"-15", "-", 15},
+	}
+
+	for _, tt := range prefixTests {
+		l := lexer.New(tt.input)
+		p := New(l)
+
+		program := p.ParseProgram()
+
+		if len(program.Statements) != 1 {
+			t.Errorf("Wrong number of statements got=%T", len(program.Statements))
+		}
+
+		t.Logf("The type is %T", program.Statements[0])
+
+		stmt := program.Statements[0].(*ast.ExpressionStatement)
+		exp := stmt.Expression.(*ast.PrefixExpression)
+
+		if exp.Operator != tt.operator {
+			t.Fatalf("ERROR Operator type not matched Expected=%s got=%s ", tt.operator, exp.operator)
+		}
+		if !testIntegerLiteral(t, exp.Right, tt.integerValue) {
+			return
+		}
+
+	}
+
+}
+
+func testIntegerLiteral(t *testing.T, il ast.Expression, value int64) {
+	integ := il.(*ast.testIntegerLiteral)
+	if integ.Value != value {
+		t.Fatalf("ERROR value does not match")
+	}
+
+}

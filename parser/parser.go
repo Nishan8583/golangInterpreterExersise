@@ -1,6 +1,9 @@
 package parser
 
 import (
+	"fmt"
+	"strconv"
+
 	"../ast"
 	"../lexer"
 	"../token"
@@ -42,6 +45,7 @@ func New(l *lexer.Lexer) *Parser {
 	// Registering the token type to their parsing functions
 	p.prefixParseFns = make(map[token.TokenType]perfixParseFn, 1)
 	p.registerPrefix(token.IDENT, p.parseIdentifier)
+	p.registerPrefix(token.INT, p.parseIntegerLiteral)
 	return p
 }
 
@@ -163,4 +167,17 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 
 func (p *Parser) parseIdentifier() ast.Expression {
 	return &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
+}
+
+func (p *Parser) parseIntegerLiteral() ast.Expression {
+	lit := &ast.IntegerLiteral{Token: p.curToken}
+
+	value, err := strconv.ParseInt(p.curToken.Literal, 0, 64)
+	if err != nil {
+		fmt.Println("ERROR while trying to generate integer literal", err)
+		return nil
+	}
+
+	lit.Value = value
+	return lit
 }

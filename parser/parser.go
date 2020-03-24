@@ -46,6 +46,8 @@ func New(l *lexer.Lexer) *Parser {
 	p.prefixParseFns = make(map[token.TokenType]perfixParseFn, 1)
 	p.registerPrefix(token.IDENT, p.parseIdentifier)
 	p.registerPrefix(token.INT, p.parseIntegerLiteral)
+	p.registerPrefix(token.BANG, p.parsePrefixExpression)
+	p.registerPrefix(token.MINUS, p.parsePrefixExpression)
 	return p
 }
 
@@ -157,6 +159,7 @@ func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
 func (p *Parser) parseExpression(precedence int) ast.Expression {
 	prefix := p.prefixParseFns[p.curToken.Type] // getting the associated function of the tokenType
 	if prefix == nil {
+		p.noPrefixParseFnError(p.curToken.Type)
 		return nil
 	}
 
@@ -180,4 +183,23 @@ func (p *Parser) parseIntegerLiteral() ast.Expression {
 
 	lit.Value = value
 	return lit
+}
+
+// For printing better error messages
+func (p *Parser) noPrefixParseFnError(t token.TokenType) {
+	msg := fmt.Sprintf("No prefix funciton associated to this token type %s", t)
+	fmt.Println(msg)
+}
+
+// now writing function that actually parses the prefixExpression
+func (p *Parser) parsePrefixExpression() ast.Expression {
+	expression := &ast.PrefixExpression{
+		Token:    p.curToken,
+		Operator: p.curToken.Literal,
+	}
+
+	p.nextToken() // to get to the integer
+
+	expression.Right = p.parseExpression(PREFIX) // now the current token type is int. so parseIntegerLiteral is callsed
+	return expression
 }

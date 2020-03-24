@@ -91,8 +91,11 @@ func TestIntegerLiteralExpression(t *testing.T) {
 
 }
 */
-
+/*
+TEST CASE FOR PREFIX PARSING
 func TestParsingPrefixExpressions(t *testing.T) {
+
+	// Creating some table testing
 	prefixTests := []struct {
 		input        string
 		operator     string
@@ -115,10 +118,18 @@ func TestParsingPrefixExpressions(t *testing.T) {
 		t.Logf("The type is %T", program.Statements[0])
 
 		stmt := program.Statements[0].(*ast.ExpressionStatement)
+
+		// If no expression was observed
+		if stmt.Expression == nil {
+			t.Fatalf("NIL Statments")
+		}
+
+		// Type cast it as PrefixExpression
 		exp := stmt.Expression.(*ast.PrefixExpression)
 
+		t.Log(exp)
 		if exp.Operator != tt.operator {
-			t.Fatalf("ERROR Operator type not matched Expected=%s got=%s ", tt.operator, exp.operator)
+			t.Fatalf("ERROR Operator type not matched Expected=%s got=%s ", tt.operator, exp.Operator)
 		}
 		if !testIntegerLiteral(t, exp.Right, tt.integerValue) {
 			return
@@ -127,11 +138,65 @@ func TestParsingPrefixExpressions(t *testing.T) {
 	}
 
 }
+*/
 
-func testIntegerLiteral(t *testing.T, il ast.Expression, value int64) {
-	integ := il.(*ast.testIntegerLiteral)
-	if integ.Value != value {
-		t.Fatalf("ERROR value does not match")
+// TEST CASE FOR INFIX PARSING
+func TestParsingInfixOperator(t *testing.T) {
+	tests := []struct {
+		input      string
+		leftValue  int64
+		operator   string
+		rightValue int64
+	}{
+		{"5+5", 5, "+", 5},
+		{"5-5", 5, "-", 5},
+		{"5*5", 5, "*", 5},
+		{"5/5", 5, "/", 5},
+		{"5==5", 5, "==", 5},
+		{"5!=5", 5, "!=", 5},
+	}
+	for _, tt := range tests {
+		l := lexer.New(tt.input)
+		p := New(l)
+
+		program := p.ParseProgram()
+
+		if len(program.Statements) != 1 {
+			t.Errorf("Wrong number of statements got=%T", len(program.Statements))
+		}
+
+		t.Logf("The type is %T", program.Statements[0])
+
+		stmt := program.Statements[0].(*ast.ExpressionStatement)
+
+		// If no expression was observed
+		if stmt.Expression == nil {
+			t.Fatalf("NIL Statments")
+		}
+
+		// Type cast it as PrefixExpression
+		exp := stmt.Expression.(*ast.InfixExpression)
+
+		t.Log(exp)
+		if exp.Operator != tt.operator {
+			t.Fatalf("ERROR Operator type not matched Expected=%s got=%s ", tt.operator, exp.Operator)
+		}
+		if !testIntegerLiteral(t, exp.Left, tt.leftValue) {
+			return
+		}
+
+		if !testIntegerLiteral(t, exp.Right, tt.rightValue) {
+			return
+		}
+
 	}
 
+}
+func testIntegerLiteral(t *testing.T, il ast.Expression, value int64) bool {
+	integ := il.(*ast.IntegerLiteral)
+	if integ.Value != value {
+		t.Fatalf("ERROR value does not match")
+		return false
+	}
+	return true
 }

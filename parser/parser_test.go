@@ -101,8 +101,8 @@ func TestParsingPrefixExpressions(t *testing.T) {
 		operator     string
 		integerValue int64
 	}{
-		{"!5", "!", 5},
-		{"-15", "-", 15},
+		{"!5", "!", 6},
+		{"-15", "-", 16},
 	}
 
 	for _, tt := range prefixTests {
@@ -148,12 +148,12 @@ func TestParsingInfixOperator(t *testing.T) {
 		operator   string
 		rightValue int64
 	}{
-		{"5+5", 5, "+", 5},
-		{"5-5", 5, "-", 5},
-		{"5*5", 5, "*", 5},
-		{"5/5", 5, "/", 5},
-		{"5==5", 5, "==", 5},
-		{"5!=5", 5, "!=", 5},
+		{"5 + 6", 5, "+", 6},
+		{"5 - 6", 5, "-", 6},
+		{"5 * 6", 5, "*", 6},
+		{"5 / 6", 5, "/", 6},
+		{"5 == 6", 5, "==", 6},
+		{"5 != 6", 5, "!=", 6},
 	}
 	for _, tt := range tests {
 		l := lexer.New(tt.input)

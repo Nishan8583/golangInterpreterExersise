@@ -140,6 +140,7 @@ func TestParsingPrefixExpressions(t *testing.T) {
 }
 */
 
+/*
 // TEST CASE FOR INFIX PARSING
 func TestParsingInfixOperator(t *testing.T) {
 	tests := []struct {
@@ -191,7 +192,7 @@ func TestParsingInfixOperator(t *testing.T) {
 
 	}
 
-}
+}*/
 func testIntegerLiteral(t *testing.T, il ast.Expression, value int64) bool {
 	integ := il.(*ast.IntegerLiteral)
 	if integ.Value != value {
@@ -199,4 +200,127 @@ func testIntegerLiteral(t *testing.T, il ast.Expression, value int64) bool {
 		return false
 	}
 	return true
+}
+
+func testIdentifier(t *testing.T, exp ast.Expression, value string) bool {
+	if exp == nil {
+		t.Errorf("ERROR the expression passed was nil")
+		return false
+	}
+
+	ident := exp.(*ast.Identifier)
+	if ident.Value != value {
+		t.Errorf("ERROR ident.value = %s but value is %s \n", ident.Value, value)
+		return false
+	}
+
+	lit := ident.TokenLiteral()
+	if lit != value {
+		t.Errorf("ERROR token literal = %s and value = %s does not match", lit, value)
+		return false
+	}
+	return true
+}
+
+func testLiteralExpression(
+	t *testing.T,
+	exp ast.Expression,
+	expected interface{},
+) bool {
+	switch v := expected.(type) {
+	case int:
+		return testIntegerLiteral(t, exp, int64(v))
+	case int64:
+		return testIntegerLiteral(t, exp, v)
+	case string:
+		return testIdentifier(t, exp, v)
+	case bool:
+		return testBooleanLiteral(t, exp, v)
+	}
+	t.Errorf("ERROR the type of the expected value passed could not be handled got=%T", exp)
+	return false
+}
+
+func testInfixExpression(t *testing.T,
+	exp ast.Expression,
+	left interface{},
+	operator string,
+	right interface{}) bool {
+
+	if exp == nil {
+		t.Error("ERROR got nil expression")
+		return false
+	}
+
+	opExp := exp.(*ast.InfixExpression)
+
+	if !(testLiteralExpression(t, opExp.Left, left)) {
+		return false
+	}
+
+	if opExp.Operator != operator {
+		t.Errorf("ERROR operator type not matched expected=%s got=%s", operator, opExp.Operator)
+		return false
+	}
+
+	if !(testLiteralExpression(t, opExp.Right, right)) {
+		return false
+	}
+	return true
+}
+
+func testBooleanLiteral(t *testing.T, exp ast.Expression, value bool) bool {
+	if exp == nil {
+		t.Error("ERROR the expression was nil")
+		return false
+	}
+
+	bo := exp.(*ast.Boolean)
+
+	if bo.Value != value {
+		t.Errorf("ERROR bo.Value=%v got=%v", bo.Value, value)
+		return false
+	}
+	return true
+}
+
+func TestParsingInfixExpression(t *testing.T) {
+	tests := []struct {
+		input      string
+		leftValue  interface{}
+		operator   string
+		rightValue interface{}
+	}{
+		{"true == true", true, "==", true},
+		{"true != true", true, "!=", true},
+		{"true == false", true, "==", false},
+		{"false == true", false, "==", true},
+		{"false == false", false, "==", false},
+	}
+
+	for _, tt := range tests {
+		l := lexer.New(tt.input)
+		p := New(l)
+
+		program := p.ParseProgram()
+
+		if len(program.Statements) != 1 {
+			t.Errorf("Wrong number of statements got=%T", len(program.Statements))
+		}
+
+		t.Logf("The type is %T", program.Statements[0])
+
+		stmt := program.Statements[0].(*ast.ExpressionStatement)
+
+		// If no expression was observed
+		if stmt.Expression == nil {
+			t.Fatalf("NIL Statments")
+		}
+
+		// Type cast it as PrefixExpression
+		exp := stmt.Expression.(*ast.InfixExpression)
+		if !testLiteralExpression(t, exp.Left, tt.leftValue) {
+			return
+		}
+	}
 }

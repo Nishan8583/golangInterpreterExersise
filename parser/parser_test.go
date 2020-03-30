@@ -284,6 +284,7 @@ func testBooleanLiteral(t *testing.T, exp ast.Expression, value bool) bool {
 	return true
 }
 
+/*
 func TestParsingInfixExpression(t *testing.T) {
 	tests := []struct {
 		input      string
@@ -323,4 +324,28 @@ func TestParsingInfixExpression(t *testing.T) {
 			return
 		}
 	}
+}
+*/
+
+func TestIfExpression(t *testing.T) {
+	input := "if (x < y) { x } else { y }"
+
+	l := lexer.New(input)
+	p := New(l)
+
+	program := p.ParseProgram()
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("ERROR got wrong number of statements got=%d", len(program.Statements))
+	}
+
+	stmt := program.Statements[0].(*ast.ExpressionStatement)
+
+	exp := stmt.Expression.(*ast.IfExpression)
+
+	if !testInfixExpression(t, exp.Condition, "x", "<", "y") {
+		return
+	}
+
+	t.Log(exp.Alternative)
 }

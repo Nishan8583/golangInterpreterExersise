@@ -327,6 +327,7 @@ func TestParsingInfixExpression(t *testing.T) {
 }
 */
 
+/*
 func TestIfExpression(t *testing.T) {
 	input := "if (x < y) { x } else { y }"
 
@@ -348,4 +349,37 @@ func TestIfExpression(t *testing.T) {
 	}
 
 	t.Log(exp.Alternative)
+}
+*/
+
+// test function parsing
+func TestFunction(t *testing.T) {
+	input := `fn(x,y) {x+y}`
+
+	l := lexer.New(input)
+	p := New(l)
+
+	program := p.ParseProgram()
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("ERROR got wrong number of statements got=%d", len(program.Statements))
+	}
+
+	stmt := program.Statements[0].(*ast.ExpressionStatement)
+	function := stmt.Expression.(*ast.FunctionLiteral)
+
+	if len(function.Parameters) != 2 {
+		t.Fatalf("ERROR got wrong number of parameters got=%d", len(function.Parameters))
+	}
+
+	testLiteralExpression(t, function.Parameters[0], "x")
+	testLiteralExpression(t, function.Parameters[1], "y")
+
+	if len(function.Body.Statements) != 1 {
+		t.Fatalf("ERROR wrong number of statements inside function body got=%d", len(function.Body.Statements))
+	}
+
+	bodyStmt := function.Body.Statements[0].(*ast.ExpressionStatement)
+
+	testInfixExpression(t, bodyStmt.Expression, "x", "+", "y")
 }

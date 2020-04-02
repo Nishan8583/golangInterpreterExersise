@@ -352,6 +352,7 @@ func TestIfExpression(t *testing.T) {
 }
 */
 
+/*
 // test function parsing
 func TestFunction(t *testing.T) {
 	input := `fn(x,y) {x+y}`
@@ -382,4 +383,15 @@ func TestFunction(t *testing.T) {
 	bodyStmt := function.Body.Statements[0].(*ast.ExpressionStatement)
 
 	testInfixExpression(t, bodyStmt.Expression, "x", "+", "y")
+}
+*/
+
+func TestCallExpressionParsing(t *testing.T) {
+	input := "add(1,2+3);"
+
+	l := lexer.New(input)
+	p := New(l)
+
+	program := p.ParseProgram()
+	t.Log(program)
 }

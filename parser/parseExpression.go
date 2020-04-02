@@ -84,7 +84,6 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 		leftExp = infix(leftExp)
 
 	}
-	fmt.Printf("\n\n\n\n\n")
 	// finished adding for the infix parsing section
 	return leftExp
 }

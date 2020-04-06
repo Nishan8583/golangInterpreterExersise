@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"./evaluator"
 	"./lexer"
 	"./parser"
 )
@@ -55,10 +56,17 @@ func main() {
 		p := parser.New(lex)
 
 		programs := p.ParseProgram()
-		fmt.Print("\nThe statementents from you input are\n\n")
-		for index, value := range programs.Statements {
-			fmt.Printf("$stmt>> %d		%v\n", index, value)
+		/*
+			fmt.Print("\nThe statementents from you input are\n\n")
+			for index, value := range programs.Statements {
+				fmt.Printf("$stmt>> %d		%v\n", index, value)
+			}
+			fmt.Println()
+		*/
+		evaluated := evaluator.Eval(programs)
+		if evaluated != nil {
+			fmt.Println(evaluated.Inspect())
 		}
-		fmt.Println()
+
 	}
 }

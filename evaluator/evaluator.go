@@ -1,6 +1,8 @@
 package evaluator
 
 import (
+	"fmt"
+
 	"../ast"
 	"../object"
 )
@@ -16,16 +18,26 @@ var (
 func Eval(node ast.Node) object.Object {
 	switch node := node.(type) {
 	case *ast.Program:
+		fmt.Println("AST Program", node)
 		return evalStatements(node.Statements)
 	case *ast.ExpressionStatement:
+		fmt.Println("AST Expression Statement", node)
 		return Eval(node.Expression)
 	case *ast.IntegerLiteral:
+		fmt.Println("AST IntegerLitereal", node)
 		return &object.Integer{Value: node.Value}
 	case *ast.Boolean:
+		fmt.Println("AST Boolean", node)
 		return nativeBoolToBooleanObject(node.Value)
 	case *ast.PrefixExpression:
+		fmt.Println("AST Prefix Expression", node)
 		right := Eval(node.Right)
 		return evalPrefixExpression(node.Operator, right)
+	case *ast.InfixExpression:
+		fmt.Println("AST Infix Expression ", node)
+		left := Eval(node.Left)
+		right := Eval(node.Right)
+		return evalInfixExpression(node.Operator, left, right)
 	}
 	return nil
 }
@@ -78,4 +90,42 @@ func evalMinusPrefixOperatorExpression(right object.Object) object.Object {
 
 	value := right.(*object.Integer).Value
 	return &object.Integer{Value: -value}
+}
+
+func evalInfixExpression(operator string, left, right object.Object) object.Object {
+	switch {
+	case left.Type() == object.INTEGER_OBJ && right.Type() == object.INTEGER_OBJ:
+		return evalIntegerExpression(operator, left, right)
+	case operator == "==":
+		return nativeBoolToBooleanObject(left == right)
+	case operator == "!=":
+		return nativeBoolToBooleanObject(left != right)
+	default:
+		return NULL
+	}
+}
+
+func evalIntegerExpression(operator string, left, right object.Object) object.Object {
+	leftVal := left.(*object.Integer).Value
+	rightVal := right.(*object.Integer).Value
+	switch operator {
+	case "+":
+		return &object.Integer{Value: leftVal + rightVal}
+	case "-":
+		return &object.Integer{Value: leftVal - rightVal}
+	case "*":
+		return &object.Integer{Value: leftVal * rightVal}
+	case "/":
+		return &object.Integer{Value: leftVal / rightVal}
+	case "<":
+		return nativeBoolToBooleanObject(leftVal < rightVal)
+	case ">":
+		return nativeBoolToBooleanObject(leftVal > rightVal)
+	case "==":
+		return nativeBoolToBooleanObject(leftVal == rightVal)
+	case "!=":
+		return nativeBoolToBooleanObject(leftVal != rightVal)
+	default:
+		return NULL
+	}
 }

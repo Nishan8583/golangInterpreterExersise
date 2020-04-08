@@ -11,9 +11,11 @@ type Object interface {
 }
 
 const (
-	INTEGER_OBJ = "INTEGER"
-	BOOLEAN_OBJ = "BOOLEAN"
-	NULL_OBJ    = "NULL"
+	INTEGER_OBJ      = "INTEGER"
+	BOOLEAN_OBJ      = "BOOLEAN"
+	NULL_OBJ         = "NULL"
+	RETURN_VALUE_OBJ = "RETURN_VALUE"
+	ERROR_OBJ        = "ERROR"
 )
 
 /*Integer object section starts here*/
@@ -52,3 +54,22 @@ func (n *Null) Type() ObjectType { return NULL_OBJ }
 
 // Inspect returns null string here
 func (n *Null) Inspect() string { return "null" }
+
+// ReturnValue struct to handle return statements, Value is a regular object type
+type ReturnValue struct {
+	Value Object
+}
+
+// Type gets the type, duh ..
+func (rv *ReturnValue) Type() ObjectType { return RETURN_VALUE_OBJ }
+
+// Inspect returns the literal value of object
+func (rv *ReturnValue) Inspect() string { return rv.Value.Inspect() }
+
+// Error is the type for handling error
+type Error struct {
+	Message string
+}
+
+func (e *Error) Type() ObjectType { return ERROR_OBJ }
+func (e *Error) Inspect() string  { return "ERROR :" + e.Message }

@@ -63,7 +63,7 @@ func main() {
 			}
 			fmt.Println()
 		*/
-		fmt.Println("Programs: ", programs)
+		evaluator.Debug("Programs: ", programs)
 		evaluated := evaluator.Eval(programs)
 		if evaluated != nil {
 			fmt.Println(evaluated.Inspect())

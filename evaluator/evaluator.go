@@ -2,6 +2,7 @@ package evaluator
 
 import (
 	"fmt"
+	"os"
 
 	"../ast"
 	"../object"
@@ -18,26 +19,26 @@ var (
 func Eval(node ast.Node) object.Object {
 	switch node := node.(type) {
 	case *ast.Program:
-		fmt.Println("AST Program", node)
+		Debug("AST Program", node)
 		return evalProgram(node)
 	case *ast.ExpressionStatement:
-		fmt.Println("AST Expression Statement", node)
+		Debug("AST Expression Statement", node)
 		return Eval(node.Expression)
 	case *ast.IntegerLiteral:
-		fmt.Println("AST IntegerLitereal", node)
+		Debug("AST IntegerLitereal", node)
 		return &object.Integer{Value: node.Value}
 	case *ast.Boolean:
-		fmt.Println("AST Boolean", node)
+		Debug("AST Boolean", node)
 		return nativeBoolToBooleanObject(node.Value)
 	case *ast.PrefixExpression:
-		fmt.Println("AST Prefix Expression", node)
+		Debug("AST Prefix Expression", node)
 		right := Eval(node.Right)
 		if isError(right) {
 			return right
 		}
 		return evalPrefixExpression(node.Operator, right)
 	case *ast.InfixExpression:
-		fmt.Println("AST Infix Expression ", node)
+		Debug("AST Infix Expression ", node)
 		left := Eval(node.Left)
 		if isError(left) {
 			return left
@@ -50,13 +51,13 @@ func Eval(node ast.Node) object.Object {
 
 		return evalInfixExpression(node.Operator, left, right)
 	case *ast.BlockStatement:
-		fmt.Println("AST Block Statement")
+		Debug("AST Block Statement")
 		return evalBlockStatement(node)
 	case *ast.IfExpression:
-		fmt.Println("AST If Expression")
+		Debug("AST If Expression")
 		return evalIfExpression(node)
 	case *ast.ReturnStatement:
-		fmt.Println("AST Return Statement")
+		Debug("AST Return Statement")
 		val := Eval(node.ReturnValue)
 		if isError(val) {
 			return val
@@ -225,4 +226,11 @@ func isError(obj object.Object) bool {
 		return obj.Type() == object.ERROR_OBJ
 	}
 	return false
+}
+
+// Debug takes any number of arguments and then prints it
+func Debug(args ...interface{}) {
+	if len(os.Args) > 1 && os.Args[1] == "--debug" {
+		fmt.Println(args...)
+	}
 }

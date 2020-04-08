@@ -3,7 +3,6 @@ package parser
 import (
 	"fmt"
 	"strconv"
-	"time"
 
 	"../ast"
 	"../token"
@@ -68,7 +67,6 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 	prefix := p.prefixParseFns[p.curToken.Type] // getting the associated function of the tokenType
 	if prefix == nil {
 		p.noPrefixParseFnError(p.curToken.Type)
-		time.Sleep(1 * time.Minute)
 		return nil
 	}
 

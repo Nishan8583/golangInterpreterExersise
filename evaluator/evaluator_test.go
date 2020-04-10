@@ -29,7 +29,8 @@ func testEval(input string) object.Object {
 	l := lexer.New(input)
 	p := parser.New(l)
 	program := p.ParseProgram()
-	return Eval(program)
+	env := object.NewEnvironment()
+	return Eval(program, env)
 
 }
 
@@ -53,6 +54,7 @@ func testIntegerObject(t *testing.T, obj object.Object, expected int64) bool {
 	return true
 }
 
+/*
 func TestBangOperator(t *testing.T) {
 	tests := []struct {
 		input    string
@@ -71,5 +73,21 @@ func TestBangOperator(t *testing.T) {
 		if booleanObj.Value != tt.expected {
 			t.Errorf("ERROR value expected=%v got=%v", tt.expected, booleanObj.Value)
 		}
+	}
+}
+*/
+
+func testLetEvaluation(t *testing.T) {
+	tests := []struct {
+		input  string
+		output int64
+	}{
+		{"let a=5;a", 5},
+		{"let a=5*5;a", 25},
+		{"let a=5; let b=6; let c = a*b;c", 30},
+	}
+
+	for _, tt := range tests {
+		testIntegerObject(t, testEval(tt.input), tt.output)
 	}
 }

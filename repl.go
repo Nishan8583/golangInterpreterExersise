@@ -7,6 +7,7 @@ import (
 
 	"./evaluator"
 	"./lexer"
+	"./object"
 	"./parser"
 )
 
@@ -41,6 +42,9 @@ func main() {
 	fmt.Printf("___THE DADA Programming Interpreter___\n%s\nNOTE: This is not completely my own creation but will rather contain modification to the the monkey programming language as taught in the book in https://interpreterbook.com/ website\n\n",
 		banner)
 	reader := bufio.NewReader(os.Stdin)
+
+	// Environment object to store the environment values
+	env := object.NewEnvironment()
 	for {
 		fmt.Printf(">>> ")
 		line, _, err := reader.ReadLine()
@@ -48,7 +52,7 @@ func main() {
 			fmt.Println("Error while reading input ->", err)
 			return
 		}
-		if string(line) == "exit" {
+		if string(line) == "exit" || string(line) == "exit()" || string(line) == "quit" || string(line) == "quit()" {
 			break
 		}
 
@@ -64,7 +68,7 @@ func main() {
 			fmt.Println()
 		*/
 		evaluator.Debug("Programs: ", programs)
-		evaluated := evaluator.Eval(programs)
+		evaluated := evaluator.Eval(programs, env)
 		if evaluated != nil {
 			fmt.Println(evaluated.Inspect())
 		}

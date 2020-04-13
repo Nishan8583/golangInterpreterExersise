@@ -21,9 +21,11 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 	case *ast.Program:
 		Debug("AST Program", node)
 		return evalProgram(node, env)
+
 	case *ast.ExpressionStatement:
 		Debug("AST Expression Statement", node)
 		return Eval(node.Expression, env)
+
 	case *ast.LetStatement:
 		Debug("AST Let Statement", node)
 		val := Eval(node.Value, env) // now evaluate the expression by passing the node.Value
@@ -31,15 +33,19 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			return val
 		}
 		env.Set(node.Name.Value, val)
+
 	case *ast.Identifier:
 		Debug("AST Identifier", node)
 		return evalIdentifier(node, env)
+
 	case *ast.IntegerLiteral:
 		Debug("AST IntegerLitereal", node)
 		return &object.Integer{Value: node.Value}
+
 	case *ast.Boolean:
 		Debug("AST Boolean", node)
 		return nativeBoolToBooleanObject(node.Value)
+
 	case *ast.PrefixExpression:
 		Debug("AST Prefix Expression", node)
 		right := Eval(node.Right, env)
@@ -47,6 +53,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			return right
 		}
 		return evalPrefixExpression(node.Operator, right)
+
 	case *ast.InfixExpression:
 		Debug("AST Infix Expression ", node)
 		left := Eval(node.Left, env)
@@ -60,12 +67,34 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		}
 
 		return evalInfixExpression(node.Operator, left, right)
+
 	case *ast.BlockStatement:
 		Debug("AST Block Statement")
 		return evalBlockStatement(node, env)
+
 	case *ast.IfExpression:
 		Debug("AST If Expression")
 		return evalIfExpression(node, env)
+
+	case *ast.FunctionLiteral:
+		Debug("AST Function literal")
+		params := node.Parameters
+		body := node.Body
+		return &object.Function{Parameters: params, Env: env, Body: body}
+
+	case *ast.CallExpression:
+		Debug("AST CAll EXPRESSOPION")
+		function := Eval(node.Function, env) // next time it will be the *ast.Identifier type and we will get that type
+		if isError(function) {
+			return function
+		}
+		args := evalExpression(node.Arguments, env) //each argument is evaluated and returnd
+		if len(args) == 1 && isError(args[0]) {
+			return args[0]
+		}
+
+		return applyFunction(function, args)
+
 	case *ast.ReturnStatement:
 		Debug("AST Return Statement")
 		val := Eval(node.ReturnValue, env)
@@ -251,4 +280,47 @@ func evalIdentifier(node *ast.Identifier, env *object.Environment) object.Object
 		return newError("identifier not found: %s", node.Value)
 	}
 	return val
+}
+
+func evalExpression(
+	exps []ast.Expression,
+	env *object.Environment,
+) []object.Object {
+	var result []object.Object
+
+	for _, er := range exps {
+		evaluated := Eval(er, env)
+		if isError(evaluated) {
+			return []object.Object{evaluated}
+		}
+		result = append(result, evaluated)
+
+	}
+	return result
+}
+
+func applyFunction(fn object.Object, args []object.Object) object.Object {
+	function, ok := fn.(*object.Function) // the object is finaly asserted as a function
+	if !ok {
+		return newError("not a function: %s", fn.Type())
+	}
+	extendedEnv := extendFunction(function, args)
+	evaluated := Eval(function.Body, extendedEnv) // evaluate the funciton body, i.e actually execute the blocked expression
+	return UnwrapReturnValue(evaluated)
+}
+
+func extendFunction(fn *object.Function, args []object.Object) *object.Environment {
+	env := object.NewEnclosedEnvironment(fn.Env)
+
+	for paramIdx, param := range fn.Parameters {
+		env.Set(param.Value, args[paramIdx])
+	}
+	return env
+}
+
+func UnwrapReturnValue(obj object.Object) object.Object {
+	if returnValue, ok := obj.(*object.ReturnValue); ok {
+		return returnValue.Value
+	}
+	return obj
 }

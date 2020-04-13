@@ -91,3 +91,17 @@ func testLetEvaluation(t *testing.T) {
 		testIntegerObject(t, testEval(tt.input), tt.output)
 	}
 }
+
+func TestFunctionApplication(t *testing.T) {
+	tests := []struct {
+		intput string
+		value  int64
+	}{
+		{"let identity=fn(x) {x;}; identity(5);", 5},
+		{"let add=fn(x,y) {x+y}; add(5,5);", 10},
+	}
+
+	for _, tt := range tests {
+		testIntegerObject(t, testEval(tt.intput), tt.value)
+	}
+}

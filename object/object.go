@@ -16,6 +16,7 @@ const (
 	NULL_OBJ         = "NULL"
 	RETURN_VALUE_OBJ = "RETURN_VALUE"
 	ERROR_OBJ        = "ERROR"
+	FUNCTION_OBJ     = "FUNCTION"
 )
 
 /*Integer object section starts here*/
@@ -73,28 +74,3 @@ type Error struct {
 
 func (e *Error) Type() ObjectType { return ERROR_OBJ }
 func (e *Error) Inspect() string  { return "ERROR :" + e.Message }
-
-/*Environment section, enviroment is something of a structure that will hold the identifiers and their values*/
-
-// Environment struct will hold the map object that sotres identifier and their values
-type Environment struct {
-	store map[string]Object // object could be anything, from simple things like integer, to boolean to functions itself
-}
-
-// NewEnvironment creates a new environment structure and returns it
-func NewEnvironment() *Environment {
-	s := make(map[string]Object)
-	return &Environment{store: s}
-}
-
-// Get is used to get value from the environment structure
-func (e *Environment) Get(name string) (Object, bool) {
-	obj, ok := e.store[name]
-	return obj, ok
-}
-
-// Set is used to store environment value to structure
-func (e *Environment) Set(name string, val Object) Object {
-	e.store[name] = val
-	return val
-}

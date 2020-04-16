@@ -45,6 +45,9 @@ const (
 	IF       = "IF"
 	ELSE     = "ELSE"
 	RETURN   = "RETURN"
+
+	// extending parser, chapter 4 section
+	STRING = "STRING"
 )
 
 var keywords = map[string]TokenType{

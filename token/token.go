@@ -37,6 +37,10 @@ const (
 	LBRACE = "{"
 	RBRACE = "}"
 
+	// For arrays
+	LBRACKET = "["
+	RBRACKET = "]"
+
 	// keywpords
 	FUNCTION = "FUNCTION"
 	LET      = "LET"

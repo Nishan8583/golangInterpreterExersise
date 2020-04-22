@@ -18,20 +18,22 @@ const (
 	PRODUCT     // *
 	PREFIX      // -X or +x
 	CALL        // myfunc()
+	INDEX       // array[0]
 
 )
 
 // Setting up operator precendence
 var precedences = map[token.TokenType]int{
-	token.EQ:      EQAULS,
-	token.NOT_EQ:  EQAULS,
-	token.LT:      LESSGREATER,
-	token.GT:      LESSGREATER,
-	token.PLUS:    SUM,
-	token.MINUS:   SUM,
-	token.SLASH:   PRODUCT,
-	token.ASTERIK: PRODUCT,
-	token.LPAREN:  CALL,
+	token.EQ:       EQAULS,
+	token.NOT_EQ:   EQAULS,
+	token.LT:       LESSGREATER,
+	token.GT:       LESSGREATER,
+	token.PLUS:     SUM,
+	token.MINUS:    SUM,
+	token.SLASH:    PRODUCT,
+	token.ASTERIK:  PRODUCT,
+	token.LPAREN:   CALL,
+	token.LBRACKET: INDEX,
 }
 
 /*Code added after expression parsing section was started*/

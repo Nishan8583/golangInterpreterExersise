@@ -18,6 +18,8 @@ const (
 	ERROR_OBJ        = "ERROR"
 	FUNCTION_OBJ     = "FUNCTION"
 	STRING_OBJ       = "STRING"
+	BUILTIN_OBJ      = "BUILTIN"
+	ARRAY_OBJ        = "ARRAY"
 )
 
 /*Integer object section starts here*/
@@ -83,3 +85,17 @@ type String struct {
 
 func (s *String) Type() ObjectType { return STRING_OBJ }
 func (s *String) Inspect() string  { return s.Value }
+
+// BuiltinFunction is an alias in function implementation
+type BuiltinFunction func(args ...Object) Object
+
+// Builtin struct for builtin functions
+type Builtin struct {
+	Fn BuiltinFunction
+}
+
+// Type returns the object type
+func (b *Builtin) Type() ObjectType { return BUILTIN_OBJ }
+
+// Inspect returns the string
+func (b *Builtin) Inspect() string { return "Built in Function" }

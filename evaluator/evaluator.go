@@ -15,6 +15,23 @@ var (
 	FALSE = &object.Boolean{Value: false}
 )
 
+var builtins = map[string]*object.Builtin{
+	"len": &object.Builtin{
+		Fn: func(args ...object.Object) object.Object {
+			if len(args) != 1 {
+				return newError("wrong number of args, got=%d want=1", len(args))
+			}
+
+			switch arg := args[0].(type) {
+			case *object.String:
+				return &object.Integer{Value: int64(len(arg.Value))}
+			default:
+				return newError("Argument to len must be string, got=%s", args[0].Type())
+			}
+		},
+	},
+}
+
 // Eval function takes a  node as argument which is the interface that means any type and returns object
 func Eval(node ast.Node, env *object.Environment) object.Object {
 	switch node := node.(type) {
@@ -105,7 +122,15 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 
 	case *ast.StringLiteral:
 		return &object.String{Value: node.Value}
+
+	case *ast.ArrayLiteral:
+		elements := evalExpression(node.Elements, env)
+		if len(elements) == 1 && isError(elements[0]) {
+			return elements[0]
+		}
+		return &object.Array{Elements: elements}
 	}
+
 	return nil
 }
 
@@ -281,10 +306,14 @@ func Debug(args ...interface{}) {
 
 func evalIdentifier(node *ast.Identifier, env *object.Environment) object.Object {
 	val, ok := env.Get(node.Value)
-	if !ok {
-		return newError("identifier not found: %s", node.Value)
+	if ok {
+		return val
 	}
-	return val
+
+	if builtin, ok := builtins[node.Value]; ok {
+		return builtin
+	}
+	return newError("identifier not found: %s", node.Value)
 }
 
 func evalExpression(
@@ -305,13 +334,18 @@ func evalExpression(
 }
 
 func applyFunction(fn object.Object, args []object.Object) object.Object {
-	function, ok := fn.(*object.Function) // the object is finaly asserted as a function
-	if !ok {
+	switch fn := fn.(type) {
+	case *object.Function:
+		extendedEnv := extendFunction(fn, args)
+		evaluated := Eval(fn.Body, extendedEnv) // evaluate the funciton body, i.e actually execute the blocked expression
+		return UnwrapReturnValue(evaluated)
+
+	case *object.Builtin:
+		return fn.Fn(args...)
+
+	default:
 		return newError("not a function: %s", fn.Type())
 	}
-	extendedEnv := extendFunction(function, args)
-	evaluated := Eval(function.Body, extendedEnv) // evaluate the funciton body, i.e actually execute the blocked expression
-	return UnwrapReturnValue(evaluated)
 }
 
 func extendFunction(fn *object.Function, args []object.Object) *object.Environment {

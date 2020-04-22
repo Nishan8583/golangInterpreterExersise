@@ -38,6 +38,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.IF, p.parseIfExpression)
 	p.registerPrefix(token.FUNCTION, p.parseFunctionLiteral)
 	p.registerPrefix(token.STRING, p.parseStringLiteral)
+	p.registerPrefix(token.LBRACKET, p.parseArrayLiteral)
 
 	// Now registering infix operator
 	p.infixParseFns = make(map[token.TokenType]infixParseFn, 1)
@@ -49,7 +50,8 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerInfix(token.NOT_EQ, p.parseInfixExpression)
 	p.registerInfix(token.LT, p.parseInfixExpression)
 	p.registerInfix(token.GT, p.parseInfixExpression)
-	p.registerInfix(token.LPAREN, p.parseCallExpression) // Because when calling parsing function call after the function name identifier, the ( is the next thing
+	p.registerInfix(token.LPAREN, p.parseCallExpression)    // Because when calling parsing function call after the function name identifier, the ( is the next thing
+	p.registerInfix(token.LBRACKET, p.parseIndexExpression) // registering infix expression for array indexing
 	return p
 }
 

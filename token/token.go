@@ -52,6 +52,9 @@ const (
 
 	// extending parser, chapter 4 section
 	STRING = "STRING"
+
+	// colon for parsing hash section
+	COLON = ":"
 )
 
 var keywords = map[string]TokenType{

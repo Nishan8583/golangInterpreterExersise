@@ -39,6 +39,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.FUNCTION, p.parseFunctionLiteral)
 	p.registerPrefix(token.STRING, p.parseStringLiteral)
 	p.registerPrefix(token.LBRACKET, p.parseArrayLiteral)
+	p.registerPrefix(token.LBRACE, p.parseHashLiteral) // for parsing hashmap
 
 	// Now registering infix operator
 	p.infixParseFns = make(map[token.TokenType]infixParseFn, 1)

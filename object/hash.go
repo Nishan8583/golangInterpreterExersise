@@ -11,6 +11,11 @@ import (
 // So the possible solutions would be check the index value through each key in GOs internal map object, or use
 // hash as key during storing and retrieveing, we are using the second option
 
+// Hashable is to ensure that the type has HashKeyFunc
+type Hashable interface {
+	HashKeyFunc() HashKey
+}
+
 // HashKey holds the hash for key
 type HashKey struct {
 	Type  ObjectType
@@ -34,7 +39,7 @@ func (i *Integer) HashKeyFunc() HashKey {
 	return HashKey{Type: i.Type(), Value: uint64(i.Value)}
 }
 
-func (s *String) HasheyFunc() HashKey {
+func (s *String) HashKeyFunc() HashKey {
 
 	// For string we are generating and using the hash of the string
 	h := fnv.New64a()
